@@ -1,0 +1,11 @@
+Package: FederatedKM
+Type: Package
+Title: Implementation of influence-function based splines for federated KM curves
+Version: 1.0
+Date: 2024-03-16
+Author: Malcolm Risk
+Maintainer: Malcolm Risk <mhrisk@umich.edu>
+Description: This package implements a method for approximating KM curves in multi-center studies when information cannot be shared across sites. Spline parameters are passed sequentially across sites and updated via the influence function of the Kaplan-Meier estimator
+License: GPL (>= 3)
+RoxygenNote: 7.2.3
+Encoding: UTF-8
