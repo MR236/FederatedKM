@@ -317,7 +317,8 @@ squared_sum_influence_logrank <- function(time, delta, treatment, spline_params,
 #' @param time name of survival time column (default is "time")
 #' @param event name of censoring indicator column (default is "delta")
 #' @param degree spline degrees of freedom
-#' @param knots spline knot locations
+#' @param knots spline number of knots
+#' @param knot_locations spline knot locations (overrides knots if provided)
 #' @param max_time time to estimate spline to
 #' @param bknots boundary knots (two values)
 #' @param weights vector of weights
@@ -325,7 +326,7 @@ squared_sum_influence_logrank <- function(time, delta, treatment, spline_params,
 #' @param confint_restriction pivot for hybrid integration (should be >0 if steep hazard observed near 0) in weighted case where confidence intervals desired
 #' @return spline parameters for risk and survival functions
 #' @export
-get_survival_splines_cloglog <- function(data, time="time", event="delta", degree=2, knots=5, max_time=max(data[,time]), bknots=c(0, max_time), weights=rep(1,nrow(data)),
+get_survival_splines_cloglog <- function(data, time="time", event="delta", degree=2, knots=5, knot_locations=NULL, max_time=max(data[,time]), bknots=c(0, max_time), weights=rep(1,nrow(data)),
                                          confint_times=NULL, confint_restriction=0) {
   
   n <- sum(weights)
@@ -338,7 +339,9 @@ get_survival_splines_cloglog <- function(data, time="time", event="delta", degre
   Risk_Curve <- survfit(Surv(data[,time], rep(1,nrow(data))) ~ 1, weights=weights)
   Risk_Set_Data <- data.frame(Time = Risk_Curve$time, S_T = Risk_Curve$surv)
   Risk_Set_Data <- filter(Risk_Set_Data, S_T != 1, Time > bknots[1], Time < bknots[2])
-  t_q <- get_time_quantiles(Event_Data$Time, Event_Data$S_T, seq(max_ST,min_ST,(-max_ST+min_ST)/(knots+1))[2:(knots+1)])
+  if (length(knot_locations)==0) {
+  t_q <- get_time_quantiles(Event_Data$Time, Event_Data$S_T, seq(max_ST,min_ST,(-max_ST+min_ST)/(knots+1))[2:(knots+1)])}
+  else {t_q <- knot_locations}
   times_event <- c(bknots[1], t_q, bknots[2])
   reg_points <- NULL
   for (i in seq(1, length(times_event)-1)){
@@ -352,9 +355,9 @@ get_survival_splines_cloglog <- function(data, time="time", event="delta", degre
   names(Event_Parameters) <- c("Knots", "Degree", "BKnots", "Coefficients")
   min_YT <- min(Risk_Set_Data$S_T)
   max_YT <- max(Risk_Set_Data$S_T)
-  
-  t_q_risk <- get_time_quantiles(Risk_Set_Data$Time, Risk_Set_Data$S_T, seq(max_YT,min_YT,(-max_YT+min_YT)/(knots+1))[2:(knots+1)])
-  
+  if (length(knot_locations)==0)
+  {t_q_risk <- get_time_quantiles(Risk_Set_Data$Time, Risk_Set_Data$S_T, seq(max_YT,min_YT,(-max_YT+min_YT)/(knots+1))[2:(knots+1)])}
+  else {t_q_risk <- knot_locations}
   times_risk <- c(bknots[1], t_q_risk, bknots[2])
   reg_points <- NULL
   for (i in seq(1, length(times_risk)-1)){
