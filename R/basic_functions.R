@@ -138,21 +138,25 @@ hazard_function_cloglog.v <- function(t, knots, degree, boundary_knots, coeffici
 #' @export
 variance_cloglog <- function(t_k, spline_params, restriction=0) {
   stretch_factor <- 1
-  PHF.v <- function(t) {hazard_function_cloglog.v(t, K, D, B, C)}
+  PHF.v <- function(t) {hazard_function_cloglog.v(t,spline_params$Event$Knots,
+                                                  spline_params$Event$Degree,
+                                                  spline_params$Event$BKnots,
+                                                  spline_params$Event$Coefficients)}
   test_t <- seq(0, max(t_k), length.out = 100)
   if (max(PHF.v(test_t)) > 1) {stretch_factor <- max(PHF.v(test_t))}
-  PHF.v <- function(t) {hazard_function_cloglog.v(t*stretch_factor,  spline_params$Event$Knots,
+  PHF.v <- function(t) {hazard_function_cloglog.v(t/ stretch_factor,  spline_params$Event$Knots,
                                                   spline_params$Event$Degree,
                                                   spline_params$Event$BKnots,
                                                   spline_params$Event$Coefficients) / stretch_factor}
-  PSF.v <- function(t) {survival_function_cloglog.v(t*stretch_factor,  spline_params$Event$Knots,
+  PSF.v <- function(t) {survival_function_cloglog.v(t / stretch_factor,  spline_params$Event$Knots,
                                                     spline_params$Event$Degree,
                                                     spline_params$Event$BKnots,
                                                     spline_params$Event$Coefficients)}
-  PRF.v <- function(t) {survival_function_cloglog.v(t*stretch_factor,  spline_params$Risk$Knots,
+  PRF.v <- function(t) {survival_function_cloglog.v(t/ stretch_factor,  spline_params$Risk$Knots,
                                                     spline_params$Risk$Degree,
                                                     spline_params$Risk$BKnots,
                                                     spline_params$Risk$Coefficients)}
+  t_k <- t_k * stretch_factor
   term1 <- 1/(c(spline_params$N)*log(PSF.v(t_k))^2)
   integrand <- function(t) {
     return(PHF.v(t)/(PRF.v(t)*(1-PHF.v(t))))
