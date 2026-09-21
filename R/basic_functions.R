@@ -143,7 +143,7 @@ variance_cloglog <- function(t_k, spline_params, restriction=0) {
                                                   spline_params$Event$BKnots,
                                                   spline_params$Event$Coefficients)}
   test_t <- seq(0, max(t_k), length.out = 100)
-  if (max(PHF.v(test_t)) > 1) {stretch_factor <- max(PHF.v(test_t))}
+  if (max(PHF.v(test_t)) > 1) {stretch_factor <- max(PHF.v(test_t))*2}
   PHF.v <- function(t) {hazard_function_cloglog.v(t/ stretch_factor,  spline_params$Event$Knots,
                                                   spline_params$Event$Degree,
                                                   spline_params$Event$BKnots,
