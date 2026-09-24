@@ -667,6 +667,9 @@ update_survival_splines_weighted <- function(spline_params, time, delta, weights
 update_survival_splines_chunk <- function(spline_params, time, delta, chunksize=5,
                                           breakpoints=5, knots_list = rep(length(spline_params$Event$Knots), ceiling(length(time)/chunksize)),
                                           degree = spline_params$Event$Degree, max_time=spline_params$Max, loud=TRUE, restriction=0) {
+  new_order <- sample(c(1:length(time)), size=length(time), replace=FALSE)
+  time <- time[new_order]
+  delta <- delta[new_order]
   updated_splines <- spline_params
   j <- 1
   for (i in seq(1, length(time), chunksize)) {
@@ -707,6 +710,10 @@ update_survival_splines_chunk <- function(spline_params, time, delta, chunksize=
 update_survival_splines_chunk_weighted <- function(spline_params, time, delta, chunksize=5, weights=rep(1, length(time)),
                                                    breakpoints=5, knots_list = rep(length(spline_params$Event$Knots), ceiling(length(time)/chunksize)),
                                                    degree = spline_params$Event$Degree, confint_times=names(spline_params$Influence), max_time=spline_params$Max, loud=TRUE, restriction=0) {
+  new_order <- sample(c(1:length(time)), size=length(time), replace=FALSE)
+  time <- time[new_order]
+  delta <- delta[new_order]
+  weights <- weights[new_order]
   updated_splines <- spline_params
   j <- 1
   for (i in seq(1, length(time), chunksize)) {
